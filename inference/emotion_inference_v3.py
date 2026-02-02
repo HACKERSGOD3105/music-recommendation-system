@@ -10,7 +10,7 @@ from pipeline.emotion_to_music import emotion_to_music_pipeline
 
 IMAGE_PATH = r"D:\annotation_processed1\sad\Sad_14.jpeg"
 
-MODEL_PATH = r"models/best_resnet34_new_phase2_sgd_v5.pth"
+MODEL_PATH = r"https://huggingface.co/Suriya-31/Emotion-ResNet34/tree/main"
 IMG_SIZE = 224
 
 CLASS_NAMES = ["angry", "happy", "neutral", "sad"]
@@ -143,3 +143,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
