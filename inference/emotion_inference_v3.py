@@ -1,3 +1,6 @@
+import os
+import urllib.request
+
 import cv2
 import torch
 import torch.nn.functional as F
@@ -10,7 +13,17 @@ from pipeline.emotion_to_music import emotion_to_music_pipeline
 
 IMAGE_PATH = r"D:\annotation_processed1\sad\Sad_14.jpeg"
 
-MODEL_PATH = r"https://huggingface.co/Suriya-31/Emotion-ResNet34/tree/main"
+
+MODEL_DIR = "models"
+MODEL_NAME = "best_resnet34_new_phase2_sgd_v5.pth"
+
+MODEL_URL = (
+    "https://huggingface.co/Suriya-31/Emotion-ResNet34/"
+    "resolve/main/best_resnet34_new_phase2_sgd_v5.pth"
+)
+
+MODEL_PATH = os.path.join(MODEL_DIR, MODEL_NAME)
+
 IMG_SIZE = 224
 
 CLASS_NAMES = ["angry", "happy", "neutral", "sad"]
@@ -34,6 +47,13 @@ preprocess = transforms.Compose([
         std=[0.229, 0.224, 0.225]
     )
 ])
+
+if not os.path.exists(MODEL_PATH):
+    os.makedirs(MODEL_DIR, exist_ok=True)
+    print("Downloading model from Hugging Face...")
+    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+    print("Model downloaded successfully.")
+
 
 model = EmotionResNet34(
     num_classes=4,
@@ -60,7 +80,6 @@ def detect_face(image_bgr):
 
 def predict_emotion_from_pil(image_pil):
    
-
     DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
     preprocess = transforms.Compose([
@@ -86,7 +105,6 @@ def predict_emotion_from_pil(image_pil):
         for i in range(len(CLASS_NAMES))
     }
 
-    
     sorted_probs = sorted(
         probs.items(),
         key=lambda x: x[1],
@@ -107,6 +125,7 @@ def predict_emotion_from_pil(image_pil):
 
     return emotion, confidence, probs, decision
 
+
 def main():
     image = cv2.imread(IMAGE_PATH)
     if image is None:
@@ -119,7 +138,7 @@ def main():
 
     face_pil = transforms.ToPILImage()(face.cpu())
 
-    emotion, confidence, probs = predict_emotion_from_pil(face_pil)
+    emotion, confidence, probs, decision = predict_emotion_from_pil(face_pil)
     music_result = emotion_to_music_pipeline(emotion)
 
     print("\n" + "=" * 60)
@@ -127,7 +146,7 @@ def main():
     print("=" * 60)
     print(f"Final Emotion : {emotion.upper()}")
     print(f"Confidence    : {confidence:.2%}")
-    print("Decision      : Top-1 prediction")
+    print(f"Decision      : {decision}")
 
     print("\n🎵 Recommended Songs:")
     for i, song in enumerate(music_result["songs"], 1):
@@ -141,6 +160,6 @@ def main():
 
     print("=" * 60)
 
+
 if __name__ == "__main__":
     main()
-
