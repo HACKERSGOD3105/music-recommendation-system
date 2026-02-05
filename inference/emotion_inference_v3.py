@@ -18,7 +18,7 @@ MODEL_DIR = "models"
 MODEL_NAME = "best_resnet34_new_phase2_sgd_v5.pth"
 
 MODEL_URL = (
-    "https://huggingface.co/Suriya-31/Emotion-ResNet34"
+    "https://huggingface.co/Suriya-31/Emotion-ResNet34/"
     "resolve/main/best_resnet34_new_phase2_sgd_v5.pth"
 )
 
@@ -163,4 +163,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
